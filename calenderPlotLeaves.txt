@@ -1,0 +1,55 @@
+function leaveCalender() {
+  // define a couple constants for the function
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const ui = SpreadsheetApp.getUi();
+
+  // Make sure the selected row has text
+  if(sheet.getActiveCell().isBlank()) {
+    ui.alert("Please select a row with a message");
+    return;
+  }
+
+  // if valid, get the correct row of data.
+    var row = sheet.getActiveCell().getRow();
+
+  // get the range for that row
+    var rowRange = sheet.getRange(row, 1, 1, 15).getValues();
+
+  // Build the object to use in Calender App
+    var email = rowRange[0][0];
+    var name = rowRange[0][1];
+    var type = rowRange[0][2];
+    var from = rowRange[0][3];
+    var fromFormat = Utilities.formatDate(from, "GMT+8", "MMMM dd, yyyy");    // test with Session.getScriptTimeZone()
+    var until = rowRange[0][4];
+    var untilFormat = Utilities.formatDate(until, "GMT+8", "MMMM dd, yyyy");   // test with Session.getScriptTimeZone()
+    var days = rowRange[0][5];
+    var status = rowRange[0][6];
+    var sent = rowRange[0][7];
+    var installs = rowRange[0][8];
+    var calender = rowRange[0][9];
+  
+  // insert sending email function here. ps: better refactor and fragment all these functions into their own file
+  
+  if (status == "APPROVED"){
+      var event = CalendarApp.getCalendarById("myazidmyi@gmail.com")
+      .createEventFromDescription("@" + name + " on " + type + " leave from " + fromFormat + " to " + untilFormat);
+    
+    if(type == "Sick Leave")
+      var color = event.setColor("2"); // green
+    
+    if(type == "Annual Leave")
+      var color = event.setColor("7"); // blue
+    
+    if(type == "Emergency Leave")
+      var color = event.setColor("11"); // red
+    
+    sheet.getRange(row, 9).setValue("Calender Updated");
+    
+  }
+  if (status == "REJECTED"){
+    ui.alert("Calender was not updated, leave was rejected.");
+    sheet.getRange(row, 9).setValue("Leave Rejected");
+  }
+    
+  }
